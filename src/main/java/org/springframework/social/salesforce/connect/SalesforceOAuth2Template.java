@@ -93,9 +93,11 @@ public class SalesforceOAuth2Template extends OAuth2Template
             String salesforceUsernameHint = request.getParameter("usernameHint");
             if (request.getParameter("forceLoginPrompt") != null) {
                 parameters.add("prompt", "login");
-            } else if (StringUtils.hasText(salesforceUsernameHint)) {
+            } else {
                 parameters.add("prompt", "select_account");
-                parameters.add("login_hint", salesforceUsernameHint);
+                if (StringUtils.hasText(salesforceUsernameHint)) {
+                    parameters.add("login_hint", salesforceUsernameHint);
+                }
             }
         }
         return super.buildAuthenticateUrl(parameters);
