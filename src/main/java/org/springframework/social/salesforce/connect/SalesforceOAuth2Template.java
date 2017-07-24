@@ -90,12 +90,11 @@ public class SalesforceOAuth2Template extends OAuth2Template
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         if (request != null) {
-            parameters.add("prompt", "select_account");
+            String salesforceUsernameHint = request.getParameter("usernameHint");
             if (request.getParameter("forceLoginPrompt") != null) {
                 parameters.add("prompt", "login");
-            }
-            String salesforceUsernameHint = request.getParameter("usernameHint");
-            if (StringUtils.hasText(salesforceUsernameHint)) {
+            } else if (StringUtils.hasText(salesforceUsernameHint)) {
+                parameters.add("prompt", "select_account");
                 parameters.add("login_hint", salesforceUsernameHint);
             }
         }
