@@ -16,7 +16,6 @@ import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.social.oauth2.OAuth2Template;
 import org.springframework.social.salesforce.connect.oauth2.SalesforceAccessGrant;
 import org.springframework.social.support.LoggingErrorHandler;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -30,6 +29,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class SalesforceOAuth2Template extends OAuth2Template
 {
+    private static final String FORCE_LOGIN_PROMPT_REQUEST_PARAMETER = "forceLoginPrompt";
+    private static final String SELECT_ACCOUNT_PROMPT_REQUEST_PARAMETER = "selectAccountPrompt";
+
     private ThreadLocal<String> instanceUrl = new ThreadLocal<String>();
     private ClientHttpRequestFactory clientHttpRequestFactory;
 
@@ -90,12 +92,12 @@ public class SalesforceOAuth2Template extends OAuth2Template
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         if (request != null) {
-            if (request.getParameter("forceLoginPrompt") != null) {
-                parameters.add("prompt", "login");
-            }
-            String salesforceUsernameHint = request.getParameter("usernameHint");
-            if (StringUtils.hasText(salesforceUsernameHint)) {
-                parameters.add("login_hint", salesforceUsernameHint);
+            if (request.getParameter(FORCE_LOGIN_PROMPT_REQUEST_PARAMETER) != null
+                    || request.getParameter(SELECT_ACCOUNT_PROMPT_REQUEST_PARAMETER) != null) {
+
+                String promptParameterValue = request.getParameter(FORCE_LOGIN_PROMPT_REQUEST_PARAMETER) != null ? "login"
+                                                                                                                 : "select_account";
+                parameters.add("prompt", promptParameterValue);
             }
         }
         return super.buildAuthenticateUrl(parameters);
