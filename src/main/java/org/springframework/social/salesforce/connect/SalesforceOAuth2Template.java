@@ -94,7 +94,6 @@ public class SalesforceOAuth2Template extends OAuth2Template
         if (request != null) {
             if (request.getParameter(FORCE_LOGIN_PROMPT_REQUEST_PARAMETER) != null
                     || request.getParameter(SELECT_ACCOUNT_PROMPT_REQUEST_PARAMETER) != null) {
-
                 String promptParameterValue = request.getParameter(FORCE_LOGIN_PROMPT_REQUEST_PARAMETER) != null ? "login"
                                                                                                                  : "select_account";
                 parameters.add("prompt", promptParameterValue);
