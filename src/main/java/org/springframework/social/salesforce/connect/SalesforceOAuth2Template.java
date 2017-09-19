@@ -29,8 +29,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class SalesforceOAuth2Template extends OAuth2Template
 {
-    private static final String FORCE_LOGIN_PROMPT_REQUEST_PARAMETER = "forceLoginPrompt";
-    private static final String SELECT_ACCOUNT_PROMPT_REQUEST_PARAMETER = "selectAccountPrompt";
+    public static final String FORCE_LOGIN_PROMPT_REQUEST_PARAMETER = "forceLoginPrompt";
+    public static final String SELECT_ACCOUNT_PROMPT_REQUEST_PARAMETER = "selectAccountPrompt";
 
     private ThreadLocal<String> instanceUrl = new ThreadLocal<String>();
     private ClientHttpRequestFactory clientHttpRequestFactory;
