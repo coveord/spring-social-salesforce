@@ -9,12 +9,12 @@ import org.springframework.social.InvalidAuthorizationException;
 import org.springframework.social.OperationNotPermittedException;
 import org.springframework.social.RateLimitExceededException;
 import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Custom error handler for handling Salesforce API specific error responses.
