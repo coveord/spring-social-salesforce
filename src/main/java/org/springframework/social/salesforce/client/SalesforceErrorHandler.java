@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.social.InvalidAuthorizationException;
 import org.springframework.social.OperationNotPermittedException;
 import org.springframework.social.RateLimitExceededException;
@@ -14,8 +13,6 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -27,8 +24,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @author Umut Utkan
  * @author Maxime Coulombe
  */
-public class ErrorHandler extends DefaultResponseErrorHandler
+public class SalesforceErrorHandler extends DefaultResponseErrorHandler
 {
+    public static final String EXCEPTION_DETAIL_SESSION_ATTRIBUTE = "salesforceExceptionDetail";
     public static final String PROVIDER_ID = "Salesforce";
 
     @Override
@@ -84,6 +82,6 @@ public class ErrorHandler extends DefaultResponseErrorHandler
     private void saveDetailedExceptionInSessionAttributes(Throwable exception)
     {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        servletRequestAttributes.getRequest().getSession().setAttribute(WebAttributes.ACCESS_DENIED_403, exception);
+        servletRequestAttributes.getRequest().getSession().setAttribute(EXCEPTION_DETAIL_SESSION_ATTRIBUTE, exception);
     }
 }
