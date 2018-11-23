@@ -68,7 +68,7 @@ public class BaseSalesforceFactory implements SalesforceFactory
     {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(ClientHttpRequestFactorySelector.getRequestFactory());
-        restTemplate.setErrorHandler(new ErrorHandler());
+        restTemplate.setErrorHandler(new SalesforceErrorHandler());
         return restTemplate;
     }
 
