@@ -12,7 +12,7 @@ public class SalesforceIpRestrictedException extends HttpClientErrorException
 {
     private static final long serialVersionUID = 5177015431887513952L;
 
-    public SalesforceIpRestrictedException(HttpStatus statusCode) {
-        super(statusCode);
+    public SalesforceIpRestrictedException() {
+        super(HttpStatus.FORBIDDEN);
     }
 }

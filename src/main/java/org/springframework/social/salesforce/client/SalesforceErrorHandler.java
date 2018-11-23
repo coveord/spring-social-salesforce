@@ -19,14 +19,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SalesforceErrorHandler extends DefaultResponseErrorHandler
 {
+    private ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+
     @Override
     public void handleError(ClientHttpResponse response) throws IOException
     {
         if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
             Map<String, String> error = extractErrorDetailsFromResponse(response);
 
-            if ("invalid_grant".equals(error.get("error")) && "ip restricted".equals(error.get("error_description"))) {
-                throw new SalesforceIpRestrictedException(HttpStatus.FORBIDDEN);
+            if (error != null && "invalid_grant".equals(error.get("error")) && "ip restricted".equals(error.get("error_description"))) {
+                throw new SalesforceIpRestrictedException();
             }
         }
 
@@ -36,9 +38,8 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
     @SuppressWarnings("unchecked")
     private Map<String, String> extractErrorDetailsFromResponse(ClientHttpResponse response) throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         try {
-            return mapper.readValue(response.getBody(), Map.class);
+            return objectMapper.readValue(response.getBody(), Map.class);
         } catch (JsonParseException e) {
             return null;
         }
