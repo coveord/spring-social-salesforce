@@ -1,8 +1,12 @@
 package org.springframework.social.salesforce.client;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -19,7 +23,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SalesforceErrorHandler extends DefaultResponseErrorHandler
 {
+    private static final Logger logger = LoggerFactory.getLogger(SalesforceErrorHandler.class);
+
     private ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+
+    @Override
+    public boolean hasError(ClientHttpResponse response) throws IOException
+    {
+        boolean hasError = super.hasError(response);
+        if (hasError && logger.isDebugEnabled()) {
+            logger.debug("Salesforce error received : '{}'.",
+                         IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
+        }
+        return hasError;
+    }
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException
@@ -27,7 +44,8 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
         if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
             Map<String, String> error = extractErrorDetailsFromResponse(response);
 
-            if (error != null && "invalid_grant".equals(error.get("error")) && "ip restricted".equals(error.get("error_description"))) {
+            if (error != null && "invalid_grant".equals(error.get("error"))
+                    && "ip restricted".equals(error.get("error_description"))) {
                 throw new SalesforceIpRestrictedException();
             }
         }
@@ -35,7 +53,6 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
         super.handleError(response);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, String> extractErrorDetailsFromResponse(ClientHttpResponse response) throws IOException
     {
         try {
