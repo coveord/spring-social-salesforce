@@ -31,9 +31,9 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
     public boolean hasError(ClientHttpResponse response) throws IOException
     {
         boolean hasError = super.hasError(response);
-        if (hasError && logger.isDebugEnabled()) {
-            logger.debug("Salesforce error received : '{}'.",
-                         IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
+        if (hasError) {
+            logger.warn("Salesforce error received : '{}'.",
+                        IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
         }
         return hasError;
     }

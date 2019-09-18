@@ -1,9 +1,13 @@
 package org.springframework.social.salesforce.api.impl;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.social.InsufficientPermissionException;
@@ -26,8 +30,20 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  */
 public class SalesforceErrorHandler extends DefaultResponseErrorHandler
 {
+    private static final Logger logger = LoggerFactory.getLogger(SalesforceErrorHandler.class);
 
     public static final String PROVIDER_ID = "Salesforce";
+
+    @Override
+    public boolean hasError(ClientHttpResponse response) throws IOException
+    {
+        boolean hasError = super.hasError(response);
+        if (hasError) {
+            logger.warn("Salesforce error received : '{}'.",
+                        IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
+        }
+        return hasError;
+    }
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException
@@ -43,8 +59,7 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
         handleUncategorizedError(response, errorDetails);
     }
 
-    private void handleSalesforceError(HttpStatus statusCode,
-                                       Map<String, Object> errorDetails)
+    private void handleSalesforceError(HttpStatus statusCode, Map<String, Object> errorDetails)
     {
         if (statusCode.equals(HttpStatus.NOT_FOUND)) {
             throw new ResourceNotFoundException(PROVIDER_ID, generateMessage(errorDetails));
@@ -53,7 +68,7 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
         } else if (statusCode.equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
             throw new InternalServerErrorException(PROVIDER_ID,
                                                    errorDetails == null ? "Contact Salesforce administrator."
-                                                                       : generateMessage(errorDetails));
+                                                                        : generateMessage(errorDetails));
         } else if (statusCode.equals(HttpStatus.BAD_REQUEST)) {
             throw new InvalidIDException(generateMessage(errorDetails));
         } else if (statusCode.equals(HttpStatus.UNAUTHORIZED)) {
@@ -63,8 +78,7 @@ public class SalesforceErrorHandler extends DefaultResponseErrorHandler
         }
     }
 
-    private void handleUncategorizedError(ClientHttpResponse response,
-                                          Map<String, Object> errorDetails)
+    private void handleUncategorizedError(ClientHttpResponse response, Map<String, Object> errorDetails)
     {
         try {
             super.handleError(response);
